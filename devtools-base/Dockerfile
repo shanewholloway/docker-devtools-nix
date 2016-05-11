@@ -22,7 +22,7 @@ WORKDIR /devtools
 RUN echo "Installing Nix (http://nixos.org/nix/)" \
  && ln -s .nix-profile/bin ./bin \
  && ln -s .nix-profile/sbin ./sbin \
- && echo "#!/bin/bash \n\
+ && echo "#!/bin/sh \n\
 DEVTOOLS_PATH=\$PATH \n\
 . /devtools/.nix-profile/etc/profile.d/nix.sh \n\
 export PATH=\"\$DEVTOOLS_PATH:/devtools/bin\" \
@@ -30,12 +30,12 @@ export PATH=\"\$DEVTOOLS_PATH:/devtools/bin\" \
   INFOPATH=\"/devtools/.nix-profile/share/info:\$INFOPATH\" \n\
 . /devtools/set-path-after " \
       > /devtools/set-path \
- && echo "#!/bin/bash \n" > /devtools/set-path-after \
- && echo "#!/bin/bash \n\
+ && echo "#!/bin/sh \n" > /devtools/set-path-after \
+ && echo "#!/bin/sh \n\
 . /devtools/set-path \n\
 exec \"\$@\" " \
       > /devtools/enter \
- && echo "#!/bin/bash \n\
+ && echo "#!/bin/sh \n\
 /devtools/bin/nix-collect-garbage --delete-old \n\
 /devtools/bin/nix-store --gc \n\
 /devtools/bin/nix-store --optimise " \
