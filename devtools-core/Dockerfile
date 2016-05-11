@@ -6,6 +6,7 @@ RUN . /devtools/set-path \
       htop less bind socat \
       nodejs \
  && /devtools/docker-nix-cleanup \
+  \
  && mkdir -p /devtools/local/npm /devtools/local/py \
  && echo "export PATH=\"\$PATH:/devtools/local/npm/bin\" " \
       >> /devtools/set-path-after \
@@ -18,9 +19,4 @@ RUN . /devtools/set-path \
 
 MAINTAINER Shane Holloway <shane.holloway@ieee.org>
 # TO IMAGE shane/devtools-nix:core-xenial
-
-# Then in an inherited Dockerfile, add:
-#
-#     VOLUME ["$HOMEBREW_PREFIX"]
-#
 

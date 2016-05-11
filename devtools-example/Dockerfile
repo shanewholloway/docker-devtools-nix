@@ -1,7 +1,6 @@
 FROM shane/devtools-nix:core-xenial
 
-RUN echo "Updating pip and npm devtools…" \
- && . /devtools/set-path \
+RUN . /devtools/set-path \
  && /devtools/bin/nix-env --install \
       python3 mercurial \
  && /devtools/docker-nix-cleanup
