@@ -3,7 +3,7 @@ FROM shane/devtools-nix:core-xenial
 RUN . /devtools/set-path \
  && /devtools/bin/nix-env --install \
       python3 mercurial \
- && /devtools/docker-nix-cleanup
+ && /devtools/lbin/docker-nix-cleanup
 
 RUN . /devtools/set-path \
  && python3 -m venv /devtools/local/py \
