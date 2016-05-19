@@ -48,7 +48,9 @@ DEVTOOLS_PATH=\$PATH \n\
 . /devtools/.nix-profile/etc/profile.d/nix.sh \n\
 export PATH=\"\$DEVTOOLS_PATH:/devtools/sbin:/devtools/bin:/devtools/lbin\" \
   MANPATH=\"/devtools/.nix-profile/share/man:\$MANPATH\" \
-  INFOPATH=\"/devtools/.nix-profile/share/info:\$INFOPATH\" \n\
+  INFOPATH=\"/devtools/.nix-profile/share/info:\$INFOPATH\" \
+  LC_ALL='en_US.utf8' \
+  \n\
 . /devtools/set-path-after " \
       > /devtools/set-path \
  && echo "#!/bin/sh \n" > /devtools/set-path-after \

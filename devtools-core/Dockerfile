@@ -4,7 +4,8 @@ RUN . /devtools/set-path \
  && /devtools/bin/nix-env --install \
       vim neovim zsh git tmux \
       htop less bind socat \
-      nodejs \
+      curl wget \
+      nodejs python3 \
  && /devtools/lbin/docker-nix-cleanup
 
 ENV PATH="/devtools/sbin:/devtools/bin:/devtools/lbin:$PATH" \
@@ -29,7 +30,7 @@ RUN mkdir -p /devtools/local/npm \
  && true
 
 ENTRYPOINT ["/devtools/lbin/tini", "--", "/devtools/enter"]
-CMD ["/bin/zsh", "-l"]
+CMD ["zsh", "-l"]
 MAINTAINER Shane Holloway <shane.holloway@ieee.org>
 # TO IMAGE shane/devtools-nix:core-xenial
 
