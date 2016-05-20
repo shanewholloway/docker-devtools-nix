@@ -1,10 +1,10 @@
 FROM shane/devtools-nix:base-xenial
 
 RUN . /devtools/set-path \
- && /devtools/bin/nix-env --install \
-      vim neovim zsh git tmux \
-      htop less bind socat \
-      curl wget \
+ && /devtools/bin/nix-env --install -j `getconf _NPROCESSORS_ONLN` \
+      zsh vim neovim tmux \
+      git curl nss-cacert-3.23 socat bind \
+      htop less \
       nodejs python3 \
  && /devtools/lbin/docker-nix-cleanup
 
@@ -30,7 +30,6 @@ RUN mkdir -p /devtools/local/npm \
  && true
 
 ENTRYPOINT ["/devtools/lbin/tini", "--", "/devtools/enter"]
-CMD ["zsh", "-l"]
 MAINTAINER Shane Holloway <shane.holloway@ieee.org>
 # TO IMAGE shane/devtools-nix:core-xenial
 

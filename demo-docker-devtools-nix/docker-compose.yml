@@ -3,14 +3,19 @@ services:
   devtools:
     image: shane/devtools-nix:example
     volumes:
-      - /nix
-      - /devtools
+      - nix:/nix
+      - devtools:/devtools
+    tty: true
+    stdin_open: true
+    restart: always
+    command: bash -l
 
   demo:
     image: ubuntu:xenial
     volumes_from:
       - devtools
     tty: true
+    stdin_open: true
     entrypoint: /devtools/enter
     command: |
       bash -c "echo \
@@ -19,6 +24,9 @@ services:
          zsh:`which zsh` \n\
          node:`which node` \n\
          py3:`which python3` \n\
-         hg:`which hg`\" \n\
+         hg:`which hg` \n\" \
       && echo && exec zsh -l"
 
+volumes:
+  nix: {}
+  devtools: {}

@@ -1,7 +1,6 @@
 FROM ubuntu:xenial
 
 RUN echo "Preparing for Nix (http://nixos.org/nix/)" \
- && localedef -i en_US -f UTF-8 en_US.UTF-8 \
  && mkdir -p -m 0775 /nix /devtools \
  && /bin/echo -e "#!/bin/sh \n\
 !(id -g 842 2>/dev/null) \
@@ -43,22 +42,22 @@ RUN echo "Installing Nix (http://nixos.org/nix/)" \
  && ln -s ./local/bin ./lbin \
  && ln -s ./.nix-profile/bin ./bin \
  && ln -s ./.nix-profile/sbin ./sbin \
- && echo "#!/bin/sh \n\
+ && /bin/echo -e "#!/bin/sh \n\
 DEVTOOLS_PATH=\$PATH \n\
 . /devtools/.nix-profile/etc/profile.d/nix.sh \n\
-export PATH=\"\$DEVTOOLS_PATH:/devtools/sbin:/devtools/bin:/devtools/lbin\" \
+export LC_ALL='C.UTF-8' \
+  PATH=\"\$DEVTOOLS_PATH:/devtools/sbin:/devtools/bin:/devtools/lbin\" \
   MANPATH=\"/devtools/.nix-profile/share/man:\$MANPATH\" \
   INFOPATH=\"/devtools/.nix-profile/share/info:\$INFOPATH\" \
-  LC_ALL='en_US.utf8' \
   \n\
 . /devtools/set-path-after " \
       > /devtools/set-path \
- && echo "#!/bin/sh \n" > /devtools/set-path-after \
- && echo "#!/bin/sh \n\
+ && /bin/echo -e "#!/bin/sh \n" > /devtools/set-path-after \
+ && /bin/echo -e "#!/bin/sh \n\
 . /devtools/set-path \n\
 exec \"\$@\" " \
       > /devtools/enter \
- && echo "#!/bin/sh \n\
+ && /bin/echo -e "#!/bin/sh \n\
 /devtools/bin/nix-collect-garbage --delete-old \n\
 /devtools/bin/nix-store --optimise " \
       > /devtools/lbin/docker-nix-cleanup \
