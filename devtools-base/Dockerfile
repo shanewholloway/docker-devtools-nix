@@ -3,19 +3,23 @@ FROM ubuntu:xenial
 RUN echo "Preparing for Nix (http://nixos.org/nix/)" \
  && mkdir -p -m 0775 /nix /devtools \
  && /bin/echo -e "#!/bin/sh \n\
-!(id -g 842 2>/dev/null) \
- && echo 'Creating 'devtools' (842) group' \
- && groupadd --gid 842 --system 'devtools' \
- && adduser root devtools \
+if ! id -g 842 2>/dev/null ; then \n\
+  echo \"Creating 'devtools' (842) group\" \n\
+  groupadd --gid 842 --system 'devtools' \n\
+  adduser root devtools \n\
+fi \n\
 \n\
-\n\
-!(id -u 842 2>/dev/null) \
- && echo 'Creating 'devtools:devtools' user (842:842) ' \
- && useradd  --uid 842 --gid devtools --system \
+if ! id -u 842 2>/dev/null ; then \n\
+  echo \"Creating 'devtools:devtools' user (842:842)\" \n\
+  useradd --uid 842 --gid devtools --system \
      --groups 'adm' --home-dir /devtools \
-     devtools \
+     devtools \n\
+fi \n\
 \n\
-\n\
+if test -z \"\$LC_ALL\" -o -n \"\$(export LC_ALL=en_US.UTF-8 >/dev/null 2>/dev/stdout)\"; then \n\
+  export LC_ALL=en_US.UTF-8 \n\
+  localedef -i en_US -f UTF-8 en_US.UTF-8 \n\
+fi \n\
 " > /devtools/ensure-user \
  && chmod +x /devtools/ensure-user \
  && /devtools/ensure-user \
@@ -37,19 +41,32 @@ RUN echo "Preparing for Nix (http://nixos.org/nix/)" \
 USER devtools
 WORKDIR /devtools
 
-RUN echo "Installing Nix (http://nixos.org/nix/)" \
+RUN echo "Customizing /devtools for Nix" \
  && mkdir -p ./local/bin \
  && ln -s ./local/bin ./lbin \
  && ln -s ./.nix-profile/bin ./bin \
  && ln -s ./.nix-profile/sbin ./sbin \
  && /bin/echo -e "#!/bin/sh \n\
 DEVTOOLS_PATH=\$PATH \n\
-. /devtools/.nix-profile/etc/profile.d/nix.sh \n\
-export LC_ALL='C.UTF-8' \
-  PATH=\"\$DEVTOOLS_PATH:/devtools/sbin:/devtools/bin:/devtools/lbin\" \
-  MANPATH=\"/devtools/.nix-profile/share/man:\$MANPATH\" \
-  INFOPATH=\"/devtools/.nix-profile/share/info:\$INFOPATH\" \
-  \n\
+if test -e /devtools/.nix-profile; then \n\
+  . /devtools/.nix-profile/etc/profile.d/nix.sh \n\
+fi \n\
+if test -z \"\$LC_ALL\" ; then \n\
+  if test -n \"\$(export LC_ALL=en_US.UTF-8 >/dev/null 2>/dev/stdout)\"; then \n\
+    echo 'Locale not set properly. Run:' \n\
+    echo \n\
+    echo '    sudo localedef -i en_US -f UTF-8 en_US.UTF-8' \n\
+    echo \n\
+  fi \n\
+fi \n\
+
+\n\
+export \\\\\\n\
+  PATH=\"\$DEVTOOLS_PATH:/devtools/sbin:/devtools/bin:/devtools/lbin\" \\\\\n\
+  MANPATH=\"/devtools/.nix-profile/share/man:\$MANPATH\" \\\\\n\
+  INFOPATH=\"/devtools/.nix-profile/share/info:\$INFOPATH\" \\\\\n\
+  ; \n\
+\n\
 . /devtools/set-path-after " \
       > /devtools/set-path \
  && /bin/echo -e "#!/bin/sh \n" > /devtools/set-path-after \
@@ -65,8 +82,9 @@ exec \"\$@\" " \
       /devtools/enter \
       /devtools/set-path \
       /devtools/set-path-after \
-      /devtools/lbin/docker-nix-cleanup \
-  \
+      /devtools/lbin/docker-nix-cleanup
+
+RUN echo "Installing Nix (http://nixos.org/nix/)" \
  && curl https://nixos.org/nix/install | USER=`whoami` sh \
  && /devtools/bin/nix-env -u \
  && /devtools/lbin/docker-nix-cleanup \
