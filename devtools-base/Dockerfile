@@ -40,6 +40,9 @@ fi \n\
 
 USER devtools
 WORKDIR /devtools
+ENV PATH="/devtools/sbin:/devtools/bin:/devtools/lbin:$PATH" \
+    GOSU_VERSION=1.9 \
+    TINI_VERSION=v0.9.0
 
 RUN echo "Customizing /devtools for Nix" \
  && mkdir -p ./local/bin \
@@ -51,6 +54,7 @@ DEVTOOLS_PATH=\$PATH \n\
 if test -e /devtools/.nix-profile; then \n\
   . /devtools/.nix-profile/etc/profile.d/nix.sh \n\
 fi \n\
+test -z \"\$TERM\" && export TERM=xterm \n\
 if test -z \"\$LC_ALL\" ; then \n\
   if test -n \"\$(export LC_ALL=en_US.UTF-8 >/dev/null 2>/dev/stdout)\"; then \n\
     echo 'Locale not set properly. Run:' \n\
@@ -59,7 +63,6 @@ if test -z \"\$LC_ALL\" ; then \n\
     echo \n\
   fi \n\
 fi \n\
-
 \n\
 export \\\\\\n\
   PATH=\"\$DEVTOOLS_PATH:/devtools/sbin:/devtools/bin:/devtools/lbin\" \\\\\n\
@@ -78,11 +81,21 @@ exec \"\$@\" " \
 /devtools/bin/nix-collect-garbage --delete-old \n\
 /devtools/bin/nix-store --optimise " \
       > /devtools/lbin/docker-nix-cleanup \
+  \
+ && curl -sSL "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-$(dpkg --print-architecture)" \
+       -o /devtools/lbin/gosu \
+ && curl -sSL "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini" \
+       -o /devtools/lbin/tini \
+  \
  && chmod +x \
       /devtools/enter \
       /devtools/set-path \
       /devtools/set-path-after \
-      /devtools/lbin/docker-nix-cleanup
+      /devtools/lbin/docker-nix-cleanup \
+      /devtools/lbin/gosu \
+      /devtools/lbin/tini \
+  \
+ && echo "DONE customizing /devtools for Nix"
 
 RUN echo "Installing Nix (http://nixos.org/nix/)" \
  && curl https://nixos.org/nix/install | USER=`whoami` sh \

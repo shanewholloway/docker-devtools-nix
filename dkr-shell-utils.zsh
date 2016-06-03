@@ -31,10 +31,22 @@ dkr-cleanup-volumes() {
   return 0
 }
 
+# dkr-cleanup-networks() {
+#  local networks=($(docker network ls -qf 'dangling=true'))
+#  if [[ -n "$networks" ]]; then
+#    echo "dkr-cleanup:: removing dangling networks:"
+#    docker network rm $networks
+#  else
+#    echo "dkr-cleanup:: zero dangling networks"
+#  fi
+#  return 0
+#}
+
 dkr-cleanup() {
   dkr-cleanup-containers
   dkr-cleanup-images
   dkr-cleanup-volumes
+#  dkr-cleanup-networks
 }
 
 dkr-images-flat() {
