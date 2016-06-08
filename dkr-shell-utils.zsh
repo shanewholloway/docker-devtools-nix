@@ -1,5 +1,12 @@
 #!/usr/bin/env zsh
 
+dkr-env-reset() {
+  export DOCKER_TLS_VERIFY=""
+  export DOCKER_HOST=""
+  export DOCKER_CERT_PATH=""
+  export DOCKER_MACHINE_NAME=""
+}
+
 dkr-cleanup-containers() {
   local containers=($(docker ps -qf 'status=exited'))
   if [[ -n "$containers" ]]; then

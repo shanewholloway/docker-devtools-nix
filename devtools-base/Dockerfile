@@ -40,7 +40,7 @@ fi \n\
 
 USER devtools
 WORKDIR /devtools
-ENV PATH="/devtools/sbin:/devtools/bin:/devtools/lbin:$PATH" \
+ENV PATH="$PATH:/devtools/sbin:/devtools/bin:/devtools/lbin" \
     GOSU_VERSION=1.9 \
     TINI_VERSION=v0.9.0
 
